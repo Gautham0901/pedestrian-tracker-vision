@@ -74,8 +74,14 @@ const HeroSection = () => {
           className="relative z-10"
         >
           <SplineContainer 
-            splineUrl="https://prod.spline.design/6Wq1Q7YGyM-iab9i/scene.splinecode" 
+            url="https://prod.spline.design/6Wq1Q7YGyM-iab9i/scene.splinecode" 
             height="500px"
+            loadingFallback={
+              <div className="flex flex-col items-center">
+                <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+                <p className="mt-4 text-sm text-muted-foreground">Loading 3D model...</p>
+              </div>
+            }
           />
         </motion.div>
       </div>
