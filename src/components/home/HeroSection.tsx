@@ -74,7 +74,7 @@ const HeroSection = () => {
           className="relative z-10"
         >
           <SplineContainer 
-            url="https://prod.spline.design/6Wq1Q7YGyM-iab9i/scene.splinecode" 
+            url="https://my.spline.design/interactiveaiwebsite-e8b11478a148f002789fbc81149e145a/" 
             height="500px"
             loadingFallback={
               <div className="flex flex-col items-center">
