@@ -1,81 +1,80 @@
 
-import React, { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import React, { useEffect, useRef, useState } from 'react';
+import { cn } from '@/lib/utils';
 
-interface SplineContainerProps {
-  splineUrl: string;
-  height?: string;
-  fallbackImageSrc?: string;
+interface SplineContainerProps extends React.HTMLAttributes<HTMLDivElement> {
+  url: string;
+  width?: string | number;
+  height?: string | number;
+  splineClass?: string;
+  loadingFallback?: React.ReactNode;
 }
 
-const SplineContainer: React.FC<SplineContainerProps> = ({
-  splineUrl,
-  height = "500px",
-  fallbackImageSrc = "",
-}) => {
-  const [isLoaded, setIsLoaded] = useState(false);
-  const [isError, setIsError] = useState(false);
+const SplineContainer = ({
+  url,
+  width = '100%',
+  height = '500px',
+  splineClass,
+  loadingFallback,
+  className,
+  ...props
+}: SplineContainerProps) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [loading, setLoading] = useState(true);
+  const [splineLoaded, setSplineLoaded] = useState(false);
 
   useEffect(() => {
-    // Dynamic import of Spline script
-    const script = document.createElement("script");
-    script.src = "https://unpkg.com/@splinetool/viewer@0.9.490/build/spline-viewer.js";
-    script.type = "module";
+    // Load Spline script dynamically
+    const script = document.createElement('script');
+    script.type = 'module';
+    script.src = 'https://unpkg.com/@splinetool/viewer@0.9.523/build/spline-viewer.js';
     script.async = true;
     script.onload = () => {
-      setIsLoaded(true);
+      setSplineLoaded(true);
     };
-    script.onerror = () => {
-      setIsError(true);
-    };
-    document.head.appendChild(script);
+    document.body.appendChild(script);
 
     return () => {
-      // Cleanup
-      document.head.removeChild(script);
+      document.body.removeChild(script);
     };
   }, []);
 
-  const containerStyles: React.CSSProperties = {
-    width: "100%",
-    height: height,
-    position: "relative",
-    overflow: "hidden",
-  };
+  useEffect(() => {
+    // Set up event listener for when Spline fully loads
+    if (splineLoaded && containerRef.current) {
+      const viewer = containerRef.current.querySelector('spline-viewer');
+      if (viewer) {
+        viewer.addEventListener('load', () => {
+          setLoading(false);
+        });
+      }
+    }
+  }, [splineLoaded]);
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.5, delay: 0.2 }}
-      style={containerStyles}
-      className="rounded-lg"
+    <div
+      ref={containerRef}
+      className={cn('relative', className)}
+      style={{ width, height }}
+      {...props}
     >
-      {isLoaded && !isError ? (
-        <>
-          <spline-viewer
-            url={splineUrl}
-            style={{ width: "100%", height: "100%" }}
-          ></spline-viewer>
-          <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-background to-transparent opacity-70" />
-        </>
-      ) : (
-        <div className="flex items-center justify-center h-full bg-muted rounded-lg">
-          {fallbackImageSrc ? (
-            <img 
-              src={fallbackImageSrc} 
-              alt="3D visualization fallback" 
-              className="max-h-full max-w-full object-contain"
-            />
-          ) : (
-            <div className="text-center p-4">
-              <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-              <p className="text-muted-foreground">Loading 3D visualization...</p>
+      {loading && (
+        <div className="absolute inset-0 flex items-center justify-center bg-card/50 backdrop-blur-sm z-10">
+          {loadingFallback || (
+            <div className="flex flex-col items-center">
+              <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+              <p className="mt-4 text-sm text-muted-foreground">Loading 3D scene...</p>
             </div>
           )}
         </div>
       )}
-    </motion.div>
+      {splineLoaded && (
+        <spline-viewer
+          url={url}
+          class={cn('w-full h-full', splineClass)}
+        ></spline-viewer>
+      )}
+    </div>
   );
 };
 

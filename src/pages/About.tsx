@@ -1,7 +1,6 @@
-
 import React from "react";
 import { motion } from "framer-motion";
-import { ArrowRight, GitHub, Globe, Mail, FileText } from "lucide-react";
+import { ArrowRight, Github, Globe, Mail, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { 
   Card, 
@@ -111,7 +110,7 @@ const About = () => {
             <div className="mt-6 flex flex-wrap gap-4">
               <Button asChild>
                 <a href="https://github.com/" target="_blank" rel="noreferrer">
-                  <GitHub className="mr-2 h-4 w-4" />
+                  <Github className="mr-2 h-4 w-4" />
                   View on GitHub
                 </a>
               </Button>
@@ -212,7 +211,7 @@ const About = () => {
                       href="#" 
                       className="text-muted-foreground hover:text-primary transition-colors"
                     >
-                      <GitHub size={18} />
+                      <Github size={18} />
                     </a>
                     <a 
                       href="#" 
